@@ -1,0 +1,11 @@
+@endpoint = http://localhost:9999
+
+#consult chapter 3
+POST {{endpoint}}/snippet/create
+Content-Type: text/plain
+
+GET {{endpoint}}/snippet/view?id=99
+Accept: text/plain
+
+GET {{endpoint}}
+Accept: text/plain
