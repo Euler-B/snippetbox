@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/euler-b/snippetbox/internal/models"
-
 	"net/http"
 	"strconv"
+
+	"github.com/euler-b/snippetbox/internal/models"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -16,35 +16,16 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	snippet, err := app.snippets.Latest()
+	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	for _, snippet := range snippet {
-		fmt.Fprintf(w, "%+v\n", snippet)
-	}
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
 
-	// estas lineas se comentan en este commit para poder hacer las consulta del listado de haikus...
-	//
-	//file := []string{
-	//	"./ui/html/pages/base.tmpl.html",
-	//	"./ui/html/partials/nav.tmpl.html",
-	//	"./ui/html/pages/home.tmpl.html",
-	//}
-	//
-	//th, err := template.ParseFiles(file...)
-	//if err != nil {
-	//	log.Print(err.Error())
-	//	app.serverError(w, err)
-	//	return
-	//}
-	//err = th.ExecuteTemplate(w, "base", nil)
-	//if err != nil {
-	//	log.Print(err.Error())
-	//	app.serverError(w, err)
-	//}
+	app.render(w, http.StatusOK, "home.tmpl.html", data)
 
 }
 
@@ -64,7 +45,12 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Fprintf(w, "%+v", snippet)
+
+	data :=app.newTemplateData(r)
+	data.Snippet = snippet
+
+		app.render(w, http.StatusOK, "view.tmpl.html", data)
+
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
